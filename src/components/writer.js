@@ -15,6 +15,7 @@ class Writer extends Component {
     this.intervalHandler = this.intervalHandler.bind(this);
     this.startWriting = this.startWriting.bind(this);
     this.saveSentence = this.saveSentence.bind(this);
+    this.testing = this.testing.bind(this);
     this.timerObj = undefined;
     this.state = {
       writing: false,
@@ -27,6 +28,7 @@ class Writer extends Component {
       imgActiveTime: 30,
       currentSentence: '',
       story: '',
+      testing: 'test'
     };
   }
   // Timer
@@ -54,7 +56,7 @@ class Writer extends Component {
   }
 
   timer() {
-    this.timerObj = setInterval(this.intervalHandler, 1000);
+    //this.timerObj = setInterval(this.intervalHandler, 1000);
   }
 
   intervalHandler() {
@@ -75,12 +77,18 @@ class Writer extends Component {
     // });
   }
 
-  setSentence = (currentSentence) => {
-    this.setState({
-      currentSentence
-    })
-  }
+  setSentence = (e) => {
+    e.preventDefault();
+    this.setState({currentSentence: e.target.value})
+    console.log('current sentence = ', e.target.value)
 
+  }
+  enterKeySaveSentence = (e) => {
+    if (e.key === "Enter" || e.key === ".") {
+      console.log("submit activated");
+      this.saveSentence();
+    }
+  }
   saveSentence = () => {
     if (this.state.imgActiveTime >= this.state.startTime) {
       this.setState({
@@ -106,88 +114,39 @@ class Writer extends Component {
       startTime: this.state.startTime + (Math.floor(Math.random() * 6) + 3),
     });
   }
-
-  enterKeySaveSentence = (e) => {
-    if (e.key === "Enter" || e.key === ".") {
-      console.log("submit activated");
-      this.saveSentence();
-    }
-  }
-
   componentDidMount() {
     this.props.createPageTitle('writer');
   }
-
+  testing(e){
+    this.setState({testing: e.target.value})
+  }
   render() {
-    document.title = this.props.docTitle;
 
-    const WriterMain = () => {
-      if (this.state.writing) {
-        return (
+    const WriterMain = (this.state.writing)?
           <div className="writer-container">
             <div className="story-header text-shadow-static">
-              <div className="timer">
-                {this.state.startTime} <FontAwesomeIcon icon="stopwatch" />
-              </div>
-              <h1 className="text-shadow-static">my <span className="story-genre">{this.state.genre}</span> story</h1>
-              <div className="keyword shadow">{this.state.keyword}</div>
-              <div className="keyword-label text-shadow-static">
-                word of the sentence:</div>
-              <div className="story-input-container">
-                <input type="text" id="story-input"
-                  className="story-input shadow"
-                  placeholder="Write here. Hit Enter or . when done."
-                  onKeyPress={(e) => this.enterKeySaveSentence(e)}
-                  value={this.state.currentSentence} onChange={e => this.setSentence(e.target.value)}
-                />
-                <button className="enter-button" onClick={() => this.saveSentence()} >
-                  <FontAwesomeIcon icon="chevron-circle-down" className="shadow-fa-light" />
-                </button>
-              </div>
+            <input 
+            placeholder="this is for testing"
+            className="testing" 
+            onChange={e => this.testing(e)} 
+            value={this.state.testing}
+            />
             </div>
-            <article className="story">
-              {this.state.story}
-              <StoryImg />
-            </article>
-          </div>
-        );
-      }
-      return (
-        <div className="writer-starter">
+          </div>:
+          <div className="writer-starter">
           <div>
             <button className="button btn-light shadow" onClick={() => this.startWriting()}>start your story</button>
           </div>
-        </div>
-      );
-    };
+        </div>;
+     
 
-    const StoryImg = () => {
-      if (this.state.imgActive) {
-        return (
-          <figure className="shadow-static">
-            <img
-              src={`./img/story/${this.state.img.file}`}
-              title={this.state.img.title}
-              alt={this.state.img.description}
-            />
-            <figcaption>
-              <a
-                href={this.state.img.from}
-                target="_blank"
-                rel="noopener noreferrer"
-              >“{this.state.img.title}”</a>
-            </figcaption>
-          </figure>
-        );
-      }
-      return '';
-    };
+    
 
     return (
       <div className="writer" >
         <TopBar />
         <main className="writer-main">
-          <WriterMain />
+          {WriterMain}
         </main>
         <ul className="writer-footer">
           <li><button className="button btn-light">Save</button></li>
